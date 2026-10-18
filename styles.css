@@ -1,0 +1,24 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f3f5f8;color:#1b1f24;font-size:18px;padding-bottom:80px}
+header{display:flex;justify-content:space-between;align-items:center;background:#1F4E79;color:#fff;padding:14px 16px;padding-top:max(14px,env(safe-area-inset-top))}
+header h1{margin:0;font-size:22px}
+.pill{background:#fff2;border-radius:20px;padding:4px 12px;font-size:14px}
+.pill.ok{background:#2e7d32}.pill.wait{background:#ef6c00}
+main{padding:12px}
+.card{background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 1px 3px #0002}
+.card.big{text-align:center}.card.small{font-size:15px}
+.km{font-size:56px;font-weight:700;color:#1F4E79}
+.label{font-weight:600}.muted{color:#5b6672;font-size:15px}
+.note{background:#fff8e1;border-left:4px solid #f9a825;padding:10px;border-radius:8px;font-size:15px}
+label{display:block;margin:8px 0;font-weight:600;font-size:16px}
+input,select,textarea{display:block;width:100%;font-size:18px;padding:12px;margin-top:6px;border:1px solid #c5ccd4;border-radius:10px;background:#fff}
+.btn{display:block;width:100%;min-height:58px;font-size:20px;font-weight:700;border:0;border-radius:14px;margin:10px 0;background:#1F4E79;color:#fff}
+.btn.go{background:#2e7d32}.btn.stop{background:#c62828}.btn.ghost{background:#e3e8ee;color:#1F4E79}
+.list{padding-left:20px}.list li{background:#fff;margin:6px 0;padding:10px;border-radius:10px}
+.banner{background:#1F4E79;color:#fff;padding:12px 16px;font-size:16px}
+.hidden{display:none!important}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #ccd;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;font-size:17px;padding:16px 0;border:0;background:none;color:#5b6672}
+nav button.active{color:#1F4E79;font-weight:700}
+h2{margin:4px 0;font-size:20px}audio{width:100%;margin-top:8px}.btn.rec{background:#c62828;color:#fff}
+#map{height:46vh;border-radius:12px;margin:8px 0}.navbanner{background:#2e7d32;color:#fff;font-size:22px;font-weight:700;padding:14px;border-radius:12px}.navbanner.off{background:#c62828}.row{display:flex;gap:8px}.row .btn{flex:1}label.inline{display:flex;gap:8px;align-items:center}label.inline input{width:auto;margin:0}.results li{cursor:pointer}.steps li.cur{background:#e8f5e9;font-weight:700}

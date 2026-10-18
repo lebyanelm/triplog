@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F4E79">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Trip Log">
+<title>Done Deal Trip Log</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Trip Log</h1>
+  <span id="sync" class="pill">…</span>
+</header>
+<div id="banner" class="banner hidden"></div>
+
+<main>
+<section id="tab-today">
+  <div class="card big">
+    <div class="label" id="todayDate"></div>
+    <div class="km"><span id="kmNow">0.0</span> km</div>
+    <div class="muted" id="dayStatus">Day not started</div>
+    <div class="muted" id="gpsStatus"></div>
+  </div>
+  <p class="note" id="keepOpen">Keep this app open on screen while driving. Phones pause GPS when the app is closed or the screen locks.</p>
+
+  <div id="startForm" class="card">
+    <label>Starting from
+      <select id="startPlace"><option>Home</option><option>Sandton office</option><option>Other</option></select>
+    </label>
+    <input id="startOther" class="hidden" placeholder="Where are you starting?">
+    <label>Odometer at start (optional)<input id="odoStart" type="number" inputmode="decimal" placeholder="e.g. 85 230"></label>
+    <button id="btnStart" class="btn go">Start day</button>
+  </div>
+
+  <div id="dayActions" class="hidden">
+    <button id="btnNav" class="btn go">&#129517; Navigate to a property</button>
+    <button id="btnStop" class="btn">Start leg / Add stop (no navigation)</button>
+    <button id="btnArrive" class="btn ghost hidden">I've arrived &ndash; add arrival notes</button>
+    <div id="navSearch" class="card hidden">
+      <label>Search address or place<input id="navQuery" placeholder="e.g. Radio Road, Alberton North" autocomplete="off"></label>
+      <div class="muted">Search needs signal. Or pick a property from your tracker:</div>
+      <button id="btnLoadProps" class="btn ghost">Load my tracker properties</button>
+      <input id="propFilter" class="hidden" placeholder="Filter tracker (ID, area, address)">
+      <ul id="navResults" class="list results"></ul>
+      <button id="btnCancelNav" class="btn ghost">Cancel</button>
+    </div>
+    <div id="stopForm" class="card hidden">
+      <h2>Declaration</h2>
+      <p class="note">Only fill this in when parked. Never type or record while driving.</p>
+      <label>1. Where are you going?<input id="stopDest" placeholder="e.g. 12 Main Rd, Wadeville"></label>
+      <label>Purpose
+        <select id="stopPurpose"><option>Site visit/photos</option><option>Office</option><option>Broker meeting</option><option>Other</option></select>
+      </label>
+      <input id="stopNote" placeholder="Purpose detail (optional)">
+      <label>2. What will you do there?<textarea id="decActivity" rows="2"></textarea></label>
+      <label>3. What have you done so far today?<textarea id="decDone" rows="2"></textarea></label>
+      <label>4. Other notes<textarea id="decNotes" rows="2"></textarea></label>
+      <div id="memoBox">
+        <b>Voice memo (optional, max 60 s)</b>
+        <button id="btnRec" class="btn ghost">&#127908; Tap to record</button>
+        <div id="recTimer" class="muted"></div>
+        <audio id="memoPlay" controls class="hidden"></audio>
+      </div>
+      <button id="btnSaveStop" class="btn go">Save &amp; start leg</button>
+      <button id="btnCancelStop" class="btn ghost">Cancel</button>
+    </div>
+    <div id="navView" class="hidden">
+      <div id="navBanner" class="navbanner">Getting route…</div>
+      <div id="map"></div>
+      <div class="row"><button id="btnArrived" class="btn go">Arrived</button><button id="btnEndNav" class="btn ghost">Stop navigation</button></div>
+      <label class="inline"><input type="checkbox" id="navVoice" checked> Speak directions</label>
+      <ol id="navSteps" class="list steps"></ol>
+    </div>
+    <div id="arriveForm" class="card hidden">
+      <h2>Arrival notes</h2>
+      <p class="note">Fill this in once parked.</p>
+      <label>Purpose of visit<select id="arrPurpose"><option>Site visit/photos</option><option>Office</option><option>Broker meeting</option><option>Other</option></select></label>
+      <label>Observations<textarea id="arrNotes" rows="3" placeholder="Condition, access, signage, vacancy…"></textarea></label>
+      <label>Property type<select id="arrType"><option></option><option>Warehouse</option><option>Factory</option><option>Industrial unit</option><option>Mini-unit</option><option>Yard / land</option><option>Office/warehouse</option><option>Other</option></select></label>
+      <label>Lease or sale<select id="arrLease"><option></option><option>Lease</option><option>Sale</option><option>Both</option><option>Unknown</option></select></label>
+      <label>Size (m²)<input id="arrSize" inputmode="decimal"></label>
+      <label>Broker board on site?<select id="arrBoard"><option></option><option>Yes</option><option>No</option></select></label>
+      <label>Board / broker details<input id="arrBoardWho" placeholder="Broker name & phone on board"></label>
+      <label>Photos taken (#)<input id="arrPhotos" type="number" inputmode="numeric" min="0"></label>
+      <label>Tracker property ID (optional)<input id="arrPropId" placeholder="e.g. P001"></label>
+      <label class="inline"><input type="checkbox" id="arrMarkVisited" checked> Set this property's Status to "Visited" in the tracker</label>
+      <div><b>Voice memo (optional, max 60 s)</b>
+        <button id="btnRec2" class="btn ghost">&#127908; Tap to record</button>
+        <div id="recTimer2" class="muted"></div><audio id="memoPlay2" controls class="hidden"></audio></div>
+      <button id="btnSaveArrive" class="btn go">Save arrival</button>
+      <button id="btnCancelArrive" class="btn ghost">Later</button>
+    </div>
+    <ol id="stopList" class="list"></ol>
+    <div class="card">
+      <label>Odometer at end (optional)<input id="odoEnd" type="number" inputmode="decimal"></label>
+      <button id="btnEnd" class="btn stop">End day</button>
+    </div>
+  </div>
+  <div id="summary" class="card hidden"></div>
+  <button id="btnNotif" class="btn ghost">Turn on reminders</button>
+</section>
+
+<section id="tab-history" class="hidden">
+  <label>Month<input id="month" type="month"></label>
+  <button id="btnCsv" class="btn">Export CSV for this month</button>
+  <div id="monthTotal" class="card"></div>
+  <ul id="historyList" class="list"></ul>
+</section>
+
+<section id="tab-settings" class="hidden">
+  <div class="card">
+    <label>Google Apps Script Web App URL<input id="setUrl" placeholder="https://script.google.com/macros/s/…/exec"></label>
+    <label>Secret token (same as in Code.gs)<input id="setToken"></label>
+    <label>openrouteservice API key (optional, free)<input id="setOrs" placeholder="Leave blank to use the free OSRM demo server"></label>
+    <label>Your email (sent to OpenStreetMap search as contact, optional)<input id="setEmail" type="email"></label>
+    <button id="btnSaveSettings" class="btn go">Save</button>
+    <button id="btnSyncNow" class="btn ghost">Sync now</button>
+  </div>
+  <div class="card small">
+    <b>Good to know</b>
+    <ul>
+      <li>GPS only counts while this app is open. If the screen locks, km stop counting. Use the odometer fields for the official total.</li>
+      <li>Reminders (08:30 start, hourly km, 17:00 summary) only appear while the app is open or recently in the background.</li>
+      <li>iPhone: reminders need iOS 16.4+ and the app added to the Home Screen.</li>
+      <li>Maps &amp; directions use OpenStreetMap. Search and new routes need signal; map areas you've already viewed and the current route keep working offline.</li>
+      <li>No signal? Everything is saved on the phone and sent to Google Sheets when you're back online.</li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<nav>
+  <button data-tab="today" class="active">Today</button>
+  <button data-tab="history">History</button>
+  <button data-tab="settings">Settings</button>
+</nav>
+<script src="core.js"></script>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="app.js"></script>
+<script src="nav.js"></script>
+</body>
+</html>
